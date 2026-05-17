@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UjiFaktaID - Netlify Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#050b14;
+--card:#0d1726;
+--border:rgba(0,180,255,.2);
+--text:#e8f4ff;
+--muted:#7ea6d1;
+--blue:#00b4ff;
+--green:#00ff9d;
+--red:#ff4266;
+--yellow:#ffd84d;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:var(--bg);
+color:var(--text);
+font-family:'Rajdhani',sans-serif;
+padding:20px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.title{
+font-family:'Bebas Neue',sans-serif;
+font-size:4rem;
+text-align:center;
+letter-spacing:3px;
+margin-top:30px;
+}
+
+.title span{
+background:linear-gradient(135deg,var(--blue),#00ffcc);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.sub{
+text-align:center;
+color:var(--muted);
+margin-top:12px;
+line-height:1.8;
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:24px;
+padding:24px;
+margin-top:30px;
+}
+
+textarea{
+width:100%;
+min-height:180px;
+background:transparent;
+border:none;
+outline:none;
+resize:none;
+color:var(--text);
+font-size:1rem;
+font-family:inherit;
+line-height:1.7;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:20px;
+border:none;
+border-radius:16px;
+background:linear-gradient(135deg,var(--blue),#0066ff);
+color:white;
+font-size:1rem;
+font-weight:700;
+cursor:pointer;
+}
+
+.loading{
+display:none;
+margin-top:20px;
+color:var(--muted);
+text-align:center;
+}
+
+.result{
+display:none;
+margin-top:25px;
+}
+
+.status{
+display:inline-block;
+padding:8px 15px;
+border-radius:999px;
+font-weight:700;
+margin-bottom:14px;
+}
+
+.valid{background:rgba(0,255,157,.12);color:var(--green)}
+.hoaks{background:rgba(255,66,102,.12);color:var(--red)}
+.miring{background:rgba(255,216,77,.12);color:var(--yellow)}
+.netral{background:rgba(0,180,255,.12);color:var(--blue)}
+
+.section{
+padding:18px;
+border-radius:18px;
+border:1px solid var(--border);
+margin-top:18px;
+}
+
+.section h3{
+margin-bottom:10px;
+}
+
+.section p{
+line-height:1.8;
+color:var(--muted);
+white-space:pre-wrap;
+}
+
+.footer{
+text-align:center;
+margin-top:40px;
+color:var(--muted);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="title">UJI<span>FAKTA</span>ID</div>
+
+<div class="sub">
+AI Fact Checker berbasis Gemini AI<br>
+Versi siap deploy ke Netlify
+</div>
+
+<div class="card">
+
+<textarea id="inputText" placeholder="Masukkan berita atau informasi yang ingin dicek..."></textarea>
+
+<button onclick="analyze()">⚡ ANALISIS</button>
+
+<div class="loading" id="loading">
+Gemini AI sedang menganalisis...
+</div>
+
+<div class="result" id="result">
+
+<div class="status" id="status"></div>
+
+<h2 id="title"></h2>
+
+<div class="section">
+<h3>📌 Tentang</h3>
+<p id="about"></p>
+</div>
+
+<div class="section">
+<h3>🔍 Cek Fakta</h3>
+<p id="fact"></p>
+</div>
+
+<div class="section">
+<h3>📊 Data</h3>
+<p id="data"></p>
+</div>
+
+<div class="section">
+<h3>🧭 Panduan</h3>
+<p id="guide"></p>
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+UjiFaktaID · Powered by Gemini AI + Netlify Functions
+</div>
+
+</div>
+
+<script>
+async function analyze(){
+
+const text=document.getElementById("inputText").value.trim();
+
+if(!text){
+alert("Masukkan informasi terlebih dahulu.");
+return;
+}
+
+document.getElementById("loading").style.display="block";
+document.getElementById("result").style.display="none";
+
+try{
+
+const res=await fetch("/.netlify/functions/analyze",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({text})
+});
+
+const data=await res.json();
+
+document.getElementById("loading").style.display="none";
+document.getElementById("result").style.display="block";
+
+const status=document.getElementById("status");
+
+status.className="status "+data.status;
+status.textContent=data.status.toUpperCase();
+
+document.getElementById("title").textContent=data.judul;
+document.getElementById("about").textContent=data.tentang;
+document.getElementById("fact").textContent=data.cek_fakta;
+document.getElementById("data").textContent=data.data;
+document.getElementById("guide").textContent=data.arahan;
+
+}catch(err){
+
+document.getElementById("loading").style.display="none";
+alert("Gagal menghubungkan AI");
+
+}
+
+}
+</script>
+
+</body>
+</html>
